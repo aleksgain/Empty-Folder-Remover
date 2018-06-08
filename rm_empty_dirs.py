@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, shutil
+import os, shutil, sys
 try:
     from os import scandir
 except ImportError:
@@ -12,13 +12,19 @@ def get_size(path):
         else:
             size += i.stat.st_rsize
     return(size/1024/1024)
-path = input('Enter the working directory (currently in \'{}\', hit Enter if agree): '.format(os.getcwd()))
-if not path:
-    path = os.getcwd()
+if len(sys.argv) == 1:
+    path = input('Enter the working directory (currently in \'{}\', hit Enter if agree): '.format(os.getcwd()))
+    if not path:
+        path = os.getcwd()
+else:
+    path = sys.argv[1]
 dirs = os.scandir(path)
 dir_dict = []
-size = input('\nEnter the minimum size for directory to survive (default is 100MB): ')
-if not size:
+if len(sys.argv) == 1:
+    size = input('\nEnter the minimum size for directory to survive (default is 100MB): ')
+    if not size:
+        size = 100
+else:
     size = 100
 for dir in dirs:
     if os.path.isdir(dir):
@@ -28,7 +34,7 @@ for dir in dirs:
 print('\nHere\'s the list of all directories that will be deleted:\n')
 for i in dir_dict:
     print(i.path)
-if input('\nAre you sure you want to delete all folders smaller than {}MB?\n(Yes/No): '.format(size)).lower() == ('yes'):
+if len(sys.argv) > 1 or input('\nAre you sure you want to delete all folders smaller than {}MB?\n(Yes/No): '.format(size)).lower() == ('yes'):
     print('\n')
     for i in dir_dict:
         try:
